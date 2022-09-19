@@ -33,7 +33,7 @@ public abstract class AbstractDependentResource<R, P extends HasMetadata>
     if (creatable || updatable) {
       if (maybeActual.isEmpty()) {
         if (creatable) {
-          var desired = desired(primary, context);
+          var desired = desired(primary, null, context);
           throwIfNull(desired, primary, "Desired");
           logForOperation("Creating", primary, desired);
           var createdResource = handleCreate(desired, primary, context);
@@ -44,7 +44,7 @@ public abstract class AbstractDependentResource<R, P extends HasMetadata>
         if (updatable) {
           final var match = updater.match(actual, primary, context);
           if (!match.matched()) {
-            final var desired = match.computedDesired().orElse(desired(primary, context));
+            final var desired = match.computedDesired().orElse(desired(primary, actual, context));
             throwIfNull(desired, primary, "Desired");
             logForOperation("Updating", primary, desired);
             var updatedResource = handleUpdate(actual, desired, primary, context);
@@ -114,7 +114,7 @@ public abstract class AbstractDependentResource<R, P extends HasMetadata>
     return updated;
   }
 
-  protected R desired(P primary, Context<P> context) {
+  protected R desired(P primary, R actual, Context<P> context) {
     throw new IllegalStateException(
         "desired method must be implemented if this DependentResource can be created and/or updated");
   }
